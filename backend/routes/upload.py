@@ -1,5 +1,7 @@
 from flask import Blueprint, request
 import os
+from services.pdf_extractor import extract_text_from_pdf
+
 upload_bp = Blueprint("upload", __name__)
 
 @upload_bp.route("/upload", methods=["POST"])
@@ -22,8 +24,11 @@ def upload_resume():
     file_path = os.path.join(upload_folder, resume.filename)
     resume.save(file_path)
 
+    resume_text = extract_text_from_pdf(file_path)
+
     return {
         "message": "Resume uploaded successfully!",
         "filename": resume.filename,
-        "saved_to": file_path
+        "saved_to": file_path,
+        "text": resume_text
     }, 200
