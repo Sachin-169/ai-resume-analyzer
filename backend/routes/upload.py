@@ -1,6 +1,8 @@
 from flask import Blueprint, request
 import os
 from services.pdf_extractor import extract_text_from_pdf
+from services.nlp_processor import process_text
+from services.skill_extractor import extract_skills
 
 upload_bp = Blueprint("upload", __name__)
 
@@ -17,18 +19,22 @@ def upload_resume():
         return {
             "error": "No file selected."
         }, 400
-    
+
     upload_folder = "uploads" # Create uploads folder if it doesn't exist
     os.makedirs(upload_folder, exist_ok=True)
-    
+
     file_path = os.path.join(upload_folder, resume.filename)
     resume.save(file_path)
 
     resume_text = extract_text_from_pdf(file_path)
+    doc = process_text(resume_text)
+    skills = extract_skills(resume_text) # NEW: pull out known skills from the resume text
 
     return {
         "message": "Resume uploaded successfully!",
         "filename": resume.filename,
         "saved_to": file_path,
-        "text": resume_text
+        "text": resume_text,
+        "token_count": len(doc),
+        "skills": skills # NEW
     }, 200

@@ -2,6 +2,8 @@ import {useState} from "react";
 
 function App(){
   const [selectedFile, setSelectedFile] = useState(null);
+  const [resumeText, setResumeText] = useState("");
+
   async function uploadResume(){
     if (!selectedFile) {
       alert("Please select a resume first.");
@@ -17,12 +19,15 @@ function App(){
     });
 
     const data = await response.json();
+    setResumeText(data.text);
+
     console.log(data);
   }
 
   return(
     <>
-      <h1>AI Resume Analyzer</h1>
+      <h1>CareerIQ</h1>
+      <h2>AI Resume Analyzer & Career Assistant</h2>
       <input type="file" onChange={(event) => {
           setSelectedFile(event.target.files[0]);
         }}
@@ -32,6 +37,8 @@ function App(){
 
       <button onClick={uploadResume}>Upload Resume</button>
       <p>Selected File: {" "} {selectedFile ? selectedFile.name : "None"}</p>
+      <h2>Extracted Resume</h2>
+      <pre>{resumeText}</pre>
     </>
   );
 }
