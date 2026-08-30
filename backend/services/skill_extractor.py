@@ -3,8 +3,7 @@ from spacy.matcher import PhraseMatcher
 
 nlp = spacy.load("en_core_web_sm")
 
-# key = canonical skill name shown to the user
-# value = every surface form / synonym we want to catch in resume or JD text
+# key is the canonical skill name shown to the user adn the value is every surface form or synonym we want to catch in resume or JD text
 SKILL_DB = {
     "Python": ["python"],
     "Java": ["java"],
@@ -42,16 +41,13 @@ SKILL_DB = {
     "CSS": ["css", "css3"],
 }
 
-# PhraseMatcher needs to share vocab with whatever pipeline processes the text.
-# attr="LOWER" makes matching case-insensitive, so "Python"/"python"/"PYTHON" all hit.
+# PhraseMatcher needs to share vocab with whatever pipeline processes the text and the attr="LOWER" makes matching case insensitive, so "Python" or "python" or"PYTHON" all hit.
 matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
 
 for canonical_name, synonyms in SKILL_DB.items():
-    # build one spaCy pattern per synonym, register them all under the canonical name
-    # -> whichever synonym matches, spaCy reports back the canonical name, not the synonym
+    # build one spaCy pattern per synonym, register them all under the canonical name andwhichever synonym matches, spaCy reports back the canonical name, not the synonym
     patterns = [nlp.make_doc(synonym) for synonym in synonyms]
     matcher.add(canonical_name, patterns)
-
 
 def extract_skills(text):
     """
